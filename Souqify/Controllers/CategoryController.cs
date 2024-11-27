@@ -27,6 +27,10 @@ namespace Souqify.Controllers
         [HttpPost]
         public IActionResult Create(Category model)
         {
+            if(model.Name == model.DisplayOrder.ToString())
+            {
+                ModelState.AddModelError("name", "Display order can not match name");
+            }
             if (!ModelState.IsValid)
                 return View();
 

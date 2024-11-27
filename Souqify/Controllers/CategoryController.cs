@@ -27,7 +27,7 @@ namespace Souqify.Controllers
         [HttpPost]
         public IActionResult Create(Category model)
         {
-            if(model.Name == model.DisplayOrder.ToString())
+            if (model.Name == model.DisplayOrder.ToString())
             {
                 ModelState.AddModelError("name", "Display order can not match name");
             }
@@ -35,7 +35,45 @@ namespace Souqify.Controllers
                 return View();
 
             _categoryService.Create(model);
+            TempData["success"] = "Category created successfully";
 
+            return RedirectToAction("Index");
+        }
+
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            if (id == 0)
+                return NotFound();
+            var categoryFromDb = await _categoryService.GetById(id);
+
+            if (categoryFromDb is null)
+                return NotFound();
+
+            return View(categoryFromDb);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(Category model)
+        {
+
+            if (!ModelState.IsValid)
+                return View();
+
+            _categoryService.Update(model);
+            TempData["success"] = "Category updated successfully";
+
+            return RedirectToAction("Index");
+        }
+
+
+        public IActionResult Delete(int id)
+        {
+            if (id == 0)
+                return NotFound();
+
+            _categoryService.Delete(id);
+            TempData["success"] = "Category Deleted successfully";
             return RedirectToAction("Index");
         }
     }

@@ -1,5 +1,4 @@
-
-
+using Souqify.Data;
 using Souqify.Services;
 
 var builder = WebApplication.CreateBuilder(args);

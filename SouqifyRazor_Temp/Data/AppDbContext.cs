@@ -1,15 +1,14 @@
-﻿using Souqify.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using SouqifyRazor_Temp.Models;
 
-namespace Souqify.Data
+namespace SouqifyRazor_Temp.Data
 {
     public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
-
         public DbSet<Category> Categories { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Category>().HasData(

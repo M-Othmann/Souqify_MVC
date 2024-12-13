@@ -1,4 +1,5 @@
-﻿using Souqify.Models;
+﻿using Souqify.Data;
+using Souqify.Models;
 
 namespace Souqify.Services
 {

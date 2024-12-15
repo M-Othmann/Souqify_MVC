@@ -2,8 +2,9 @@
 using Souqify.Models;
 
 
-namespace Souqify.Controllers
+namespace Souqify.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class CategoryController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

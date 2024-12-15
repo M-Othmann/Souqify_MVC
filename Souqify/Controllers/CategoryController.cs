@@ -1,20 +1,21 @@
-﻿using Souqify.Models;
-using Souqify.Services;
+﻿using Souqify.DataAccess.Repository.IRepository;
+using Souqify.Models;
+
 
 namespace Souqify.Controllers
 {
     public class CategoryController : Controller
     {
-        private readonly ICategoryService _categoryService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CategoryController(ICategoryService categoryService)
+        public CategoryController(IUnitOfWork unitOfWork)
         {
-            _categoryService = categoryService;
+            _unitOfWork = unitOfWork;
         }
 
         public IActionResult Index()
         {
-            var categoryList = _categoryService.GetAll();
+            var categoryList = _unitOfWork.Category.GetAll();
             return View(categoryList);
         }
 
@@ -34,18 +35,19 @@ namespace Souqify.Controllers
             if (!ModelState.IsValid)
                 return View();
 
-            _categoryService.Create(model);
+            _unitOfWork.Category.Add(model);
+            _unitOfWork.Save();
             TempData["success"] = "Category created successfully";
 
             return RedirectToAction("Index");
         }
 
 
-        public async Task<IActionResult> Edit(int id)
+        public IActionResult Edit(int id)
         {
             if (id == 0)
                 return NotFound();
-            var categoryFromDb = await _categoryService.GetById(id);
+            var categoryFromDb = _unitOfWork.Category.GetFirstOrDefault(c => c.Id == id);
 
             if (categoryFromDb is null)
                 return NotFound();
@@ -60,7 +62,8 @@ namespace Souqify.Controllers
             if (!ModelState.IsValid)
                 return View();
 
-            _categoryService.Update(model);
+            _unitOfWork.Category.Update(model);
+            _unitOfWork.Save();
             TempData["success"] = "Category updated successfully";
 
             return RedirectToAction("Index");
@@ -72,7 +75,9 @@ namespace Souqify.Controllers
             if (id == 0)
                 return NotFound();
 
-            _categoryService.Delete(id);
+            var categoryFromDb = _unitOfWork.Category.GetFirstOrDefault(c => c.Id == id);
+            _unitOfWork.Category.Remove(categoryFromDb);
+            _unitOfWork.Save();
             TempData["success"] = "Category Deleted successfully";
             return RedirectToAction("Index");
         }

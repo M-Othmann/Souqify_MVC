@@ -13,11 +13,23 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Souqify.DataAccess\Souqify.DataAccess.csproj" />
 		<ProjectReference Include="..\Souqify.Models\Souqify.Models.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Areas\Admin\Controllers\" />
+		<Folder Include="Areas\Admin\Data\" />
+		<Folder Include="Areas\Admin\Models\" />
+		<Folder Include="Areas\Admin\Views\" />
+	  <Folder Include="Areas\Customer\Controllers\" />
+	  <Folder Include="Areas\Customer\Data\" />
+	  <Folder Include="Areas\Customer\Models\" />
+	  <Folder Include="Areas\Customer\Views\" />
 	</ItemGroup>
 
 </Project>

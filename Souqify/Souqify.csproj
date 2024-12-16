@@ -21,8 +21,4 @@
 		<ProjectReference Include="..\Souqify.Models\Souqify.Models.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Controllers\" />
-	</ItemGroup>
-
 </Project>

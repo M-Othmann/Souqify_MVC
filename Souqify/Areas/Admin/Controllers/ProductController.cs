@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Souqify.DataAccess.Repository.IRepository;
 using Souqify.Models;
+using Souqify.Models.ViewModels;
 
 namespace Souqify.Areas.Admin.Controllers
 {
@@ -26,7 +27,7 @@ namespace Souqify.Areas.Admin.Controllers
             return View(productList);
         }
 
-        public IActionResult Create()
+        public IActionResult Upsert(int? id)
         {
             IEnumerable<SelectListItem> categoryList = _unitOfWork.Category.GetAll().Select(c => new SelectListItem
             {
@@ -35,49 +36,52 @@ namespace Souqify.Areas.Admin.Controllers
             });
 
             //ViewBag.categoryList = categoryList;
-            ViewData["categoryList"] = categoryList;
+            //ViewData["categoryList"] = categoryList;
 
-            return View();
+            ProductVM productVM = new()
+            {
+                CategoryList = categoryList,
+                Product = new Product()
+            };
+
+            if (id is null || id == 0)
+            {
+                return View(productVM);
+            }
+            else
+            {
+                productVM.Product = _unitOfWork.Product.GetFirstOrDefault(p => p.Id == id);
+                return View(productVM);
+            }
+
         }
 
 
         [HttpPost]
-        public IActionResult Create(Product model)
+        public IActionResult Upsert(ProductVM model, IFormFile? file)
         {
-            if (!ModelState.IsValid)
-                return View();
+            if (ModelState.IsValid)
+            {
+                _unitOfWork.Product.Add(model.Product);
+                _unitOfWork.Save();
+                TempData["success"] = "Product created successfully";
 
-            _unitOfWork.Product.Add(model);
-            _unitOfWork.Save();
-            TempData["success"] = "Product created successfully";
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                model.CategoryList = _unitOfWork.Category.GetAll().Select(c => new SelectListItem
+                {
+                    Text = c.Name,
+                    Value = c.Id.ToString()
+                });
 
-            return RedirectToAction("Index");
-        }
 
-        public IActionResult Edit(int id)
-        {
-            if (id == 0)
-                return NotFound();
+                return View(model);
+            }
 
-            var productFromDb = _unitOfWork.Product.GetFirstOrDefault(p => p.Id == id);
 
-            if (productFromDb is null)
-                return NotFound();
 
-            return View(productFromDb);
-        }
-
-        [HttpPost]
-        public IActionResult Edit(Product model)
-        {
-            if (!ModelState.IsValid)
-                return View();
-
-            _unitOfWork.Product.Update(model);
-            _unitOfWork.Save();
-            TempData["success"] = "Product updated successfully";
-
-            return RedirectToAction("Index");
         }
 
         public IActionResult Delete(int id)

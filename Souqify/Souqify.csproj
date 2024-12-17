@@ -21,4 +21,8 @@
 		<ProjectReference Include="..\Souqify.Models\Souqify.Models.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="wwwroot\images\products\" />
+	</ItemGroup>
+
 </Project>

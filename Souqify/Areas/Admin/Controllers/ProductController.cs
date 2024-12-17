@@ -11,10 +11,12 @@ namespace Souqify.Areas.Admin.Controllers
     public class ProductController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ProductController(IUnitOfWork unitOfWork)
+        public ProductController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public IActionResult Index()
@@ -62,7 +64,41 @@ namespace Souqify.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                _unitOfWork.Product.Add(model.Product);
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+
+                if (file is not null)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string productPath = Path.Combine(wwwRootPath, @"images\products");
+
+
+                    if (!string.IsNullOrEmpty(model.Product.ImageUrl))
+                    {
+                        //delete old image
+                        var oldImagePath = Path.Combine(wwwRootPath, model.Product.ImageUrl.TrimStart('\\'));
+
+                        if (System.IO.File.Exists(oldImagePath))
+                            System.IO.File.Delete(oldImagePath);
+
+                    }
+
+                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+
+                    model.Product.ImageUrl = @"\images\products\" + fileName;
+                }
+
+                if (model.Product.Id == 0)
+                {
+                    _unitOfWork.Product.Add(model.Product);
+                }
+                else
+                {
+                    _unitOfWork.Product.Update(model.Product);
+
+                }
                 _unitOfWork.Save();
                 TempData["success"] = "Product created successfully";
 

@@ -22,7 +22,7 @@ namespace Souqify.Areas.Admin.Controllers
         public IActionResult Index()
         {
             List<Product> productList = _unitOfWork.Product
-                .GetAll()
+                .GetAll(includeProperties: "Category")
                 .ToList();
 
 

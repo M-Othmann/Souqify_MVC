@@ -132,5 +132,19 @@ namespace Souqify.Areas.Admin.Controllers
 
             return RedirectToAction("Index");
         }
+
+        #region API Calls
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            List<Product> productList = _unitOfWork.Product
+               .GetAll(includeProperties: "Category")
+               .ToList();
+
+            return Json(new { data = productList });
+        }
+
+        #endregion
     }
 }

@@ -9,6 +9,21 @@
         "toastr.min.js",
         "toastr.min.css"
       ]
+    },
+    {
+      "library": "datatables.net@2.1.8",
+      "destination": "wwwroot/lib/datatables.net/",
+      "files": [
+        "dataTables.min.js"
+      ]
+    },
+    {
+      "library": "datatables@1.10.21",
+      "destination": "wwwroot/lib/datatables/",
+      "files": [
+        "js/jquery.dataTables.min.js",
+        "css/jquery.dataTables.min.css"
+      ]
     }
   ]
 }

@@ -41,7 +41,7 @@ namespace Souqify.Models
         [Range(1, 1000)]
         public double Price100 { get; set; }
 
-
+        [Display(Name = "Category")]
         public int CategoryId { get; set; }
 
         [ForeignKey("CategoryId")]
@@ -49,6 +49,7 @@ namespace Souqify.Models
         public Category Category { get; set; }
 
         [ValidateNever]
+        [Display(Name = "Image")]
         public string ImageUrl { get; set; }
     }
 }

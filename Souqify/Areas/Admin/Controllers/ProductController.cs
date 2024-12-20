@@ -120,18 +120,18 @@ namespace Souqify.Areas.Admin.Controllers
 
         }
 
-        public IActionResult Delete(int id)
-        {
-            if (id == 0)
-                return NotFound();
+        /*        public IActionResult Delete(int id)
+                {
+                    if (id == 0)
+                        return NotFound();
 
-            var productFromDb = _unitOfWork.Product.GetFirstOrDefault(p => p.Id == id);
-            _unitOfWork.Product.Remove(productFromDb);
-            _unitOfWork.Save();
-            TempData["success"] = "Product deleted successfully";
+                    var productFromDb = _unitOfWork.Product.GetFirstOrDefault(p => p.Id == id);
+                    _unitOfWork.Product.Remove(productFromDb);
+                    _unitOfWork.Save();
+                    TempData["success"] = "Product deleted successfully";
 
-            return RedirectToAction("Index");
-        }
+                    return RedirectToAction("Index");
+                }*/
 
         #region API Calls
 
@@ -143,6 +143,28 @@ namespace Souqify.Areas.Admin.Controllers
                .ToList();
 
             return Json(new { data = productList });
+        }
+
+        [HttpDelete]
+        public IActionResult Delete(int? id)
+        {
+            var productToBeDeleted = _unitOfWork.Product.GetFirstOrDefault(p => p.Id == id);
+
+            if (productToBeDeleted is null)
+                return Json(new { success = false, message = "Error while deleting" });
+
+            var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, productToBeDeleted.ImageUrl.TrimStart('\\'));
+
+            if (System.IO.File.Exists(oldImagePath))
+                System.IO.File.Delete(oldImagePath);
+
+
+            _unitOfWork.Product.Remove(productToBeDeleted);
+            _unitOfWork.Save();
+
+
+            return Json(new { success = true, message = "Product deleted successfully" });
+
         }
 
         #endregion

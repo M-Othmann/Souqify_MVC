@@ -58,7 +58,7 @@ namespace Souqify.Migrations
 
             migrationBuilder.DropColumn(
                 name: "Discriminator",
-                table: "AspNetUsers");
+               table: "AspNetUsers");
 
             migrationBuilder.DropColumn(
                 name: "Name",

@@ -26,20 +26,48 @@ namespace Souqify.Areas.Customer.Controllers
 
             CartVM = new()
             {
-                ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(c => c.AppUserId == userId, includeProperties: "Product")
+                ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(c => c.AppUserId == userId, includeProperties: "Product"),
+                OrderHeader = new()
             };
 
             foreach (var cart in CartVM.ShoppingCartList)
             {
                 cart.Price = GetPriceBasedOnQuantity(cart);
-                CartVM.OrderTotal += (cart.Price * cart.Count);
+                CartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
             }
             return View(CartVM);
         }
 
         public IActionResult Summary()
         {
-            return View();
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            CartVM = new()
+            {
+                ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(c => c.AppUserId == userId, includeProperties: "Product"),
+                OrderHeader = new()
+            };
+
+            CartVM.OrderHeader.ApplicationUser = _unitOfWork.ApplicationUser.GetFirstOrDefault(u => u.Id == userId);
+
+
+            CartVM.OrderHeader.Name = CartVM.OrderHeader.ApplicationUser.Name;
+            CartVM.OrderHeader.PhoneNumber = CartVM.OrderHeader.ApplicationUser.PhoneNumber;
+            CartVM.OrderHeader.StreetAddress = CartVM.OrderHeader.ApplicationUser.StreetAddress;
+            CartVM.OrderHeader.City = CartVM.OrderHeader.ApplicationUser.City;
+            CartVM.OrderHeader.State = CartVM.OrderHeader.ApplicationUser.State;
+            CartVM.OrderHeader.PostalCode = CartVM.OrderHeader.ApplicationUser.PostalCode;
+
+
+
+            foreach (var cart in CartVM.ShoppingCartList)
+            {
+                cart.Price = GetPriceBasedOnQuantity(cart);
+                CartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
+            }
+            return View(CartVM);
+
         }
 
         public IActionResult Plus(int cartId)

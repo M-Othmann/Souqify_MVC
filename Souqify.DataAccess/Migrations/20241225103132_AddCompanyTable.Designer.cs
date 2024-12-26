@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Souqify.Data;
 
@@ -11,9 +12,11 @@ using Souqify.Data;
 namespace Souqify.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241225103132_AddCompanyTable")]
+    partial class AddCompanyTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -445,9 +448,6 @@ namespace Souqify.Migrations
                     b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("CompanyId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -460,8 +460,6 @@ namespace Souqify.Migrations
 
                     b.Property<string>("StreetAddress")
                         .HasColumnType("nvarchar(max)");
-
-                    b.HasIndex("CompanyId");
 
                     b.HasDiscriminator().HasValue("ApplicationUser");
                 });
@@ -526,15 +524,6 @@ namespace Souqify.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("Souqify.Models.ApplicationUser", b =>
-                {
-                    b.HasOne("Souqify.Models.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId");
-
-                    b.Navigation("Company");
                 });
 #pragma warning restore 612, 618
         }

@@ -14,6 +14,8 @@ namespace Souqify.DataAccess.Repository
 
         public IProductRepository Product { get; private set; }
 
+        public ICompanyRepository Company { get; private set; }
+
         private AppDbContext _db;
 
         public UnitOfWork(AppDbContext db)
@@ -21,6 +23,7 @@ namespace Souqify.DataAccess.Repository
             _db = db;
             Category = new CategoryRepository(_db);
             Product = new ProductRepository(_db);
+            Company = new CompanyRepository(_db);
         }
 
         public void Save()

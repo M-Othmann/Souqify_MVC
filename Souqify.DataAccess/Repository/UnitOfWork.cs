@@ -22,6 +22,9 @@ namespace Souqify.DataAccess.Repository
 
         public IApplicationUserRepository ApplicationUser { get; private set; }
 
+        public IOrderDetailReposiotry OrderDetail { get; private set; }
+        public IOrderHeaderReposiotry OrderHeader { get; private set; }
+
         private AppDbContext _db;
 
         public UnitOfWork(AppDbContext db)
@@ -32,6 +35,9 @@ namespace Souqify.DataAccess.Repository
             Company = new CompanyRepository(_db);
             ShoppingCart = new ShoppingCartRepository(_db);
             ApplicationUser = new ApplicationUserRepository(_db);
+            OrderDetail = new OrderDetailReposiotry(_db);
+            OrderHeader = new OrderHeaderReposiotry(_db);
+
         }
 
         public void Save()

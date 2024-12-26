@@ -17,6 +17,9 @@ namespace Souqify.DataAccess.Repository.IRepository
         IShoppingCartRepository ShoppingCart { get; }
         IApplicationUserRepository ApplicationUser { get; }
 
+        IOrderDetailReposiotry OrderDetail { get; }
+        IOrderHeaderReposiotry OrderHeader { get; }
+
         void Save();
     }
 }

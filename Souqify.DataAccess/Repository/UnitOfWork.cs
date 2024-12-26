@@ -1,5 +1,6 @@
 ﻿using Souqify.Data;
 using Souqify.DataAccess.Repository.IRepository;
+using Souqify.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,9 @@ namespace Souqify.DataAccess.Repository
 
         public ICompanyRepository Company { get; private set; }
 
+
+        public IShoppingCartRepository ShoppingCart { get; private set; }
+
         private AppDbContext _db;
 
         public UnitOfWork(AppDbContext db)
@@ -24,6 +28,7 @@ namespace Souqify.DataAccess.Repository
             Category = new CategoryRepository(_db);
             Product = new ProductRepository(_db);
             Company = new CompanyRepository(_db);
+            ShoppingCart = new ShoppingCartRepository(_db);
         }
 
         public void Save()

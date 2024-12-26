@@ -27,9 +27,12 @@ namespace Souqify.DataAccess.Repository
         }
 
 
-        public IEnumerable<T> GetAll(string? includeProperties = null)
+        public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter, string? includeProperties = null)
         {
             IQueryable<T> query = dbset;
+            if (filter is not null)
+                query = query.Where(filter);
+
 
             if (!string.IsNullOrEmpty(includeProperties))
             {
@@ -41,9 +44,20 @@ namespace Souqify.DataAccess.Repository
             return query.ToList();
         }
 
-        public T GetFirstOrDefault(Expression<Func<T, bool>> filter, string? includeProperties = null)
+        public T GetFirstOrDefault(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = false)
         {
-            IQueryable<T> query = dbset;
+            IQueryable<T> query;
+            if (tracked)
+            {
+                query = dbset;
+
+            }
+            else
+            {
+                query = dbset.AsNoTracking();
+
+            }
+            query = query.Where(filter);
             if (!string.IsNullOrEmpty(includeProperties))
             {
                 foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
@@ -51,8 +65,9 @@ namespace Souqify.DataAccess.Repository
                     query = query.Include(includeProp);
                 }
             }
-            query = query.Where(filter);
+
             return query.FirstOrDefault();
+
         }
 
         public void Remove(T entity)

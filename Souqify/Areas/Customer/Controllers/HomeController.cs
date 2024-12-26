@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Souqify.DataAccess.Repository.IRepository;
 using Souqify.Models;
@@ -26,9 +28,44 @@ namespace Souqify.Areas.Customer.Controllers
 
         public IActionResult Details(int id)
         {
-            Product product = _unitOfWork.Product.GetFirstOrDefault(p => p.Id == id, includeProperties: "Category");
+            ShoppingCart cart = new()
+            {
+                Product = _unitOfWork.Product.GetFirstOrDefault(p => p.Id == id, includeProperties: "Category"),
+                Count = 1,
+                ProductId = id
 
-            return View(product);
+            };
+
+
+            return View(cart);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public IActionResult Details(ShoppingCart cart)
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            cart.AppUserId = userId;
+            cart.Id = 0;
+
+
+            ShoppingCart cartFromDb = _unitOfWork.ShoppingCart.GetFirstOrDefault(c => c.AppUserId == userId && c.ProductId == cart.ProductId);
+
+            if (cartFromDb is not null)
+            {
+                //shopping cart exists
+                cartFromDb.Count += cart.Count;
+                _unitOfWork.ShoppingCart.Update(cartFromDb);
+            }
+            else
+            {
+                //add cart
+                _unitOfWork.ShoppingCart.Add(cart);
+            }
+            TempData["success"] = "Cart updated successfully";
+            _unitOfWork.Save();
+            return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Privacy()

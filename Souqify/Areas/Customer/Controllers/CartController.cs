@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Souqify.DataAccess.Repository.IRepository;
 using Souqify.Models;
 using Souqify.Models.ViewModels;
+using Souqify.Utilities;
 using System.Security.Claims;
 
 namespace Souqify.Areas.Customer.Controllers
@@ -12,6 +13,7 @@ namespace Souqify.Areas.Customer.Controllers
     public class CartController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        [BindProperty]
         public ShoppingCartVM CartVM { get; set; }
 
         public CartController(IUnitOfWork unitOfWork)
@@ -68,6 +70,73 @@ namespace Souqify.Areas.Customer.Controllers
             }
             return View(CartVM);
 
+        }
+
+
+        [HttpPost]
+        [ActionName("Summary")]
+        public IActionResult SummaryPOST()
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            CartVM.ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(c => c.AppUserId == userId, includeProperties: "Product");
+
+
+            CartVM.OrderHeader.OrderDate = System.DateTime.Now;
+            CartVM.OrderHeader.ApplicationUserId = userId;
+
+            ApplicationUser appUser = _unitOfWork.ApplicationUser.GetFirstOrDefault(u => u.Id == userId);
+
+
+            foreach (var cart in CartVM.ShoppingCartList)
+            {
+                cart.Price = GetPriceBasedOnQuantity(cart);
+                CartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
+            }
+
+            if (appUser.CompanyId.GetValueOrDefault() == 0)
+            {
+                //regulat customer and we need to capture payment
+                CartVM.OrderHeader.PaymentStatus = SD.PaymentStatusPending;
+                CartVM.OrderHeader.OrderStatus = SD.StatusPending;
+            }
+            else
+            {
+                //company user
+                CartVM.OrderHeader.PaymentStatus = SD.PaymentStatusDelayedPayment;
+                CartVM.OrderHeader.OrderStatus = SD.StatusApproved;
+            }
+
+            _unitOfWork.OrderHeader.Add(CartVM.OrderHeader);
+            _unitOfWork.Save();
+
+            foreach (var cart in CartVM.ShoppingCartList)
+            {
+                OrderDetail orderDetail = new()
+                {
+                    ProductId = cart.ProductId,
+                    OrderHeaderId = CartVM.OrderHeader.Id,
+                    Price = cart.Price,
+                    Count = cart.Count
+                };
+                _unitOfWork.OrderDetail.Add(orderDetail);
+                _unitOfWork.Save();
+            }
+            if (appUser.CompanyId.GetValueOrDefault() == 0)
+            {
+                //regular user we need to capture payment stripe logic
+            }
+
+            return RedirectToAction(nameof(OrderConfirmation), new { id = CartVM.OrderHeader.Id });
+
+        }
+
+
+
+        public IActionResult OrderConfirmation(int id)
+        {
+            return View(id);
         }
 
         public IActionResult Plus(int cartId)

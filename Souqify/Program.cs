@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Souqify.Utilities;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Stripe;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
 
 
 
@@ -44,6 +46,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Souqify.Models\Souqify.Models.csproj" />
+    <ProjectReference Include="..\Souqify.Utilities\Souqify.Utilities.csproj" />
   </ItemGroup>
 
 </Project>

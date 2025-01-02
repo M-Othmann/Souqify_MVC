@@ -7,7 +7,7 @@ $(document).ready(function () {
 
 
 function loadDataTable() {
-    dataTable = $('#tblDataComp').DataTable({
+    dataTable = $('#tblData').DataTable({
         "ajax": { url: '/admin/user/getall', },
 
         "columns": [
@@ -15,7 +15,7 @@ function loadDataTable() {
             { data: 'email', "width": "15%" },
             { data: 'phoneNumber', "width": "15%" },
             { data: 'company.name', "width": "15%" },
-            { data: '', "width": "15%" },
+            { data: 'role', "width": "15%" },
             {
                 data: 'id',
                 "render": function (data) {

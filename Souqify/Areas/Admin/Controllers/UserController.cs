@@ -52,7 +52,29 @@ namespace Souqify.Areas.Admin.Controllers
         }
 
 
+        [HttpPost]
+        public IActionResult LockUnlock([FromBody] string id)
+        {
+            var objFromDb = _db.ApplicationUsers.FirstOrDefault(u => u.Id == id);
+            if (objFromDb is null)
+                return Json(new { success = false, message = "Error while Locking/Unlocking" });
 
+
+            if (objFromDb is not null && objFromDb.LockoutEnd > DateTime.Now)
+            {
+                //user is currently locked and we need to unlock them
+                objFromDb.LockoutEnd = DateTime.Now;
+            }
+            else
+            {
+                objFromDb.LockoutEnd = DateTime.Now.AddYears(100);
+            }
+
+            _db.SaveChanges();
+
+            return Json(new { success = true, message = "Operation successfully" });
+
+        }
 
 
         #endregion

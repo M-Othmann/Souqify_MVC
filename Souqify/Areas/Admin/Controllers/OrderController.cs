@@ -148,7 +148,7 @@ namespace Souqify.Areas.Admin.Controllers
 
             orderVm.OrderDetail = _unitOfWork.OrderDetail.GetAll(u => u.OrderHeaderId == orderVm.OrderHeader.Id, includeProperties: "Product");
 
-            var domain = "https://localhost:44314/";
+            var domain = Request.Scheme + "://" + Request.Host.Value + "/";
             //regular user we need to capture payment stripe logic
             var options = new Stripe.Checkout.SessionCreateOptions
             {

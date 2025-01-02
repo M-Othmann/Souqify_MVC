@@ -126,7 +126,7 @@ namespace Souqify.Areas.Customer.Controllers
             }
             if (appUser.CompanyId.GetValueOrDefault() == 0)
             {
-                var domain = "https://localhost:44314/";
+                var domain = Request.Scheme + "://" + Request.Host.Value + "/";
                 //regular user we need to capture payment stripe logic
                 var options = new Stripe.Checkout.SessionCreateOptions
                 {

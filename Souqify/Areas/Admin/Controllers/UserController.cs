@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Souqify.Data;
 using Souqify.DataAccess.Repository.IRepository;
 using Souqify.Models;
+using Souqify.Models.ViewModels;
 using Souqify.Utilities;
 
 namespace Souqify.Areas.Admin.Controllers
@@ -21,6 +23,31 @@ namespace Souqify.Areas.Admin.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+
+        public IActionResult RoleManagement(string userId)
+        {
+
+            string RoleId = _db.UserRoles.FirstOrDefault(u => u.UserId == userId).RoleId;
+
+            RoleModelVM RoleVM = new RoleModelVM
+            {
+                AppUser = _db.ApplicationUsers.Include(u => u.Company).FirstOrDefault(u => u.Id == userId),
+                RoleList = _db.Roles.Select(i => new SelectListItem
+                {
+                    Text = i.Name,
+                    Value = i.Name
+                }),
+                CompanyList = _db.Companies.Select(i => new SelectListItem
+                {
+                    Text = i.Name,
+                    Value = i.Id.ToString(),
+                }),
+            };
+
+            RoleVM.AppUser.Role = _db.Roles.FirstOrDefault(u => u.Id == RoleId).Name;
+            return View(RoleVM);
         }
 
 

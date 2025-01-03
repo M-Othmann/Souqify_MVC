@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Souqify.Data;
@@ -14,10 +15,12 @@ namespace Souqify.Areas.Admin.Controllers
     public class UserController : Controller
     {
         private readonly AppDbContext _db;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public UserController(AppDbContext db)
+        public UserController(AppDbContext db, UserManager<IdentityUser> userManager)
         {
             _db = db;
+            _userManager = userManager;
         }
 
         public IActionResult Index()
@@ -48,6 +51,37 @@ namespace Souqify.Areas.Admin.Controllers
 
             RoleVM.AppUser.Role = _db.Roles.FirstOrDefault(u => u.Id == RoleId).Name;
             return View(RoleVM);
+        }
+
+
+        [HttpPost]
+        public IActionResult RoleManagement(RoleModelVM roleVM)
+        {
+
+            string RoleId = _db.UserRoles.FirstOrDefault(u => u.UserId == roleVM.AppUser.Id).RoleId;
+
+            string oldRole = _db.Roles.FirstOrDefault(u => u.Id == RoleId).Name;
+
+            if (!(roleVM.AppUser.Role == oldRole))
+            {
+                //a role was updated
+                ApplicationUser appUser = _db.ApplicationUsers.FirstOrDefault(u => u.Id == roleVM.AppUser.Id);
+
+                if (roleVM.AppUser.Role == SD.Role_Company)
+                {
+                    appUser.CompanyId = roleVM.AppUser.CompanyId;
+                }
+                if (oldRole == SD.Role_Company)
+                {
+                    appUser.CompanyId = null;
+                }
+                _db.SaveChanges();
+
+                _userManager.RemoveFromRoleAsync(appUser, oldRole).GetAwaiter().GetResult();
+                _userManager.AddToRoleAsync(appUser, roleVM.AppUser.Role).GetAwaiter().GetResult();
+            }
+
+            return RedirectToAction("Index");
         }
 
 

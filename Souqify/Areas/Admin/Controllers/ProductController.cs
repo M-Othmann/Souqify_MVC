@@ -75,7 +75,7 @@ namespace Souqify.Areas.Admin.Controllers
                     string productPath = Path.Combine(wwwRootPath, @"images\products");
 
 
-                    if (!string.IsNullOrEmpty(model.Product.ImageUrl))
+                    /*if (!string.IsNullOrEmpty(model.Product.ImageUrl))
                     {
                         //delete old image
                         var oldImagePath = Path.Combine(wwwRootPath, model.Product.ImageUrl.TrimStart('\\'));
@@ -83,14 +83,14 @@ namespace Souqify.Areas.Admin.Controllers
                         if (System.IO.File.Exists(oldImagePath))
                             System.IO.File.Delete(oldImagePath);
 
-                    }
+                    }*/
 
                     using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
                     {
                         file.CopyTo(fileStream);
                     }
 
-                    model.Product.ImageUrl = @"\images\products\" + fileName;
+                    /* model.Product.ImageUrl = @"\images\products\" + fileName;*/
                 }
 
                 if (model.Product.Id == 0)
@@ -156,10 +156,10 @@ namespace Souqify.Areas.Admin.Controllers
             if (productToBeDeleted is null)
                 return Json(new { success = false, message = "Error while deleting" });
 
-            var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, productToBeDeleted.ImageUrl.TrimStart('\\'));
+            /*var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, productToBeDeleted.ImageUrl.TrimStart('\\'));
 
             if (System.IO.File.Exists(oldImagePath))
-                System.IO.File.Delete(oldImagePath);
+                System.IO.File.Delete(oldImagePath);*/
 
 
             _unitOfWork.Product.Remove(productToBeDeleted);

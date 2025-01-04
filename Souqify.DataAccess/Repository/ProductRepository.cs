@@ -34,11 +34,11 @@ namespace Souqify.DataAccess.Repository
                 objFromDb.CategoryId = obj.CategoryId;
                 objFromDb.Author = obj.Author;
 
-                if (obj.ImageUrl is not null)
+                /*if (obj.ImageUrl is not null)
                 {
                     objFromDb.ImageUrl = obj.ImageUrl;
 
-                }
+                }*/
 
             }
         }

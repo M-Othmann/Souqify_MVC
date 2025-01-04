@@ -48,8 +48,6 @@ namespace Souqify.Models
         [ValidateNever]
         public Category Category { get; set; }
 
-        [ValidateNever]
-        [Display(Name = "Image")]
-        public string ImageUrl { get; set; }
+
     }
 }

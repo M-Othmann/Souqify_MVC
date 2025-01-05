@@ -63,16 +63,53 @@ namespace Souqify.Areas.Admin.Controllers
 
 
         [HttpPost]
-        public IActionResult Upsert(ProductVM model, IFormFile? file)
+        public IActionResult Upsert(ProductVM model, List<IFormFile> files)
         {
             if (ModelState.IsValid)
             {
+                if (model.Product.Id == 0)
+                {
+                    _unitOfWork.Product.Add(model.Product);
+                }
+                else
+                {
+                    _unitOfWork.Product.Update(model.Product);
+
+                }
+                _unitOfWork.Save();
                 string wwwRootPath = _webHostEnvironment.WebRootPath;
 
-                if (file is not null)
+                if (files is not null)
                 {
-                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                    string productPath = Path.Combine(wwwRootPath, @"images\products");
+
+                    foreach (IFormFile file in files)
+                    {
+                        string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                        string productPath = @"images\products\product-" + model.Product.Id;
+                        string finalPath = Path.Combine(wwwRootPath, productPath);
+
+                        if (!Directory.Exists(finalPath))
+                            Directory.CreateDirectory(finalPath);
+
+                        using (var fileStream = new FileStream(Path.Combine(finalPath, fileName), FileMode.Create))
+                        {
+                            file.CopyTo(fileStream);
+                        }
+
+                        ProductImage prodImage = new()
+                        {
+                            ImageUrl = @"\" + productPath + @"\" + fileName,
+                            ProductId = model.Product.Id
+                        };
+
+                        if (model.Product.ProductImages is null)
+                            model.Product.ProductImages = new List<ProductImage>();
+
+                        model.Product.ProductImages.Add(prodImage);
+                    }
+
+                    _unitOfWork.Product.Update(model.Product);
+                    _unitOfWork.Save();
 
 
                     /*if (!string.IsNullOrEmpty(model.Product.ImageUrl))
@@ -85,25 +122,16 @@ namespace Souqify.Areas.Admin.Controllers
 
                     }*/
 
-                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
-                    {
-                        file.CopyTo(fileStream);
-                    }
+                    /* using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
+                     {
+                         file.CopyTo(fileStream);
+                     }*/
 
                     /* model.Product.ImageUrl = @"\images\products\" + fileName;*/
                 }
 
-                if (model.Product.Id == 0)
-                {
-                    _unitOfWork.Product.Add(model.Product);
-                }
-                else
-                {
-                    _unitOfWork.Product.Update(model.Product);
 
-                }
-                _unitOfWork.Save();
-                TempData["success"] = "Product created successfully";
+                TempData["success"] = "Product created/updated successfully";
 
                 return RedirectToAction("Index");
             }

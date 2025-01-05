@@ -12,6 +12,8 @@ namespace Souqify.DataAccess.Repository.IRepository
 
         IProductRepository Product { get; }
 
+        IProductImageRepository ProductImage { get; }
+
         ICompanyRepository Company { get; }
 
         IShoppingCartRepository ShoppingCart { get; }

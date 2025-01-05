@@ -25,6 +25,8 @@ namespace Souqify.DataAccess.Repository
         public IOrderDetailReposiotry OrderDetail { get; private set; }
         public IOrderHeaderReposiotry OrderHeader { get; private set; }
 
+        public IProductImageRepository ProductImage { get; private set; }
+
         private AppDbContext _db;
 
         public UnitOfWork(AppDbContext db)
@@ -37,7 +39,7 @@ namespace Souqify.DataAccess.Repository
             ApplicationUser = new ApplicationUserRepository(_db);
             OrderDetail = new OrderDetailReposiotry(_db);
             OrderHeader = new OrderHeaderReposiotry(_db);
-
+            ProductImage = new ProductImageRepository(_db);
         }
 
         public void Save()

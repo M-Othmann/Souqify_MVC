@@ -151,6 +151,30 @@ namespace Souqify.Areas.Admin.Controllers
 
         }
 
+
+        public IActionResult DeleteImage(int imageId)
+        {
+            var imageToDelete = _unitOfWork.ProductImage.GetFirstOrDefault(i => i.Id == imageId);
+            var prodId = imageToDelete.ProductId;
+            if (imageToDelete is not null)
+            {
+                if (!string.IsNullOrEmpty(imageToDelete.ImageUrl))
+                {
+                    var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, imageToDelete.ImageUrl.TrimStart('\\'));
+
+                    if (System.IO.File.Exists(oldImagePath))
+                        System.IO.File.Delete(oldImagePath);
+                }
+
+                _unitOfWork.ProductImage.Remove(imageToDelete);
+                _unitOfWork.Save();
+
+                TempData["success"] = "Deleted successfully";
+            }
+
+            return RedirectToAction(nameof(Upsert), new { id = prodId });
+        }
+
         /*        public IActionResult Delete(int id)
                 {
                     if (id == 0)

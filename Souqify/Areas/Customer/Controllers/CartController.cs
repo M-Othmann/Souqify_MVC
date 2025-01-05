@@ -33,8 +33,12 @@ namespace Souqify.Areas.Customer.Controllers
                 OrderHeader = new()
             };
 
+
+            IEnumerable<ProductImage> prodImages = _unitOfWork.ProductImage.GetAll();
+
             foreach (var cart in CartVM.ShoppingCartList)
             {
+                cart.Product.ProductImages = prodImages.Where(p => p.ProductId == cart.Product.Id).ToList();
                 cart.Price = GetPriceBasedOnQuantity(cart);
                 CartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
             }
